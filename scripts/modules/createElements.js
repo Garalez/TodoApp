@@ -188,14 +188,6 @@ const createTasks = ({taskId, taskImportance, taskName, taskState}) => {
   const stateCell = document.createElement('td');
   stateCell.textContent = 'В процессе';
 
-  if (taskState === 'Выполнена') {
-    tr.removeAttribute('class');
-    tr.classList.add('table-success');
-    taskNameCell.removeAttribute('class');
-    taskNameCell.classList.add('text-decoration-line-through');
-    stateCell.textContent = 'Выполнена';
-  }
-
   const btnTd = document.createElement('td');
   btnTd.style.display = 'flex';
   btnTd.style.gap = '5px';
@@ -204,11 +196,20 @@ const createTasks = ({taskId, taskImportance, taskName, taskState}) => {
   const successBtn = document.createElement('button');
   editBtn.classList.add('btn', 'btn-warning');
   deleteBtn.classList.add('btn', 'btn-danger');
-  successBtn.classList.add('btn', 'btn-success');
+  successBtn.classList.add('btn', 'btn-success', 'done-toggle');
   editBtn.textContent = 'Редактировать';
   deleteBtn.textContent = 'Удалить';
   successBtn.textContent = 'Завершить';
   btnTd.append(editBtn, deleteBtn, successBtn);
+
+  if (taskState === 'Выполнена') {
+    tr.removeAttribute('class');
+    tr.classList.add('table-success');
+    taskNameCell.removeAttribute('class');
+    taskNameCell.classList.add('text-decoration-line-through');
+    stateCell.textContent = 'Выполнена';
+    successBtn.classList.replace('btn-success', 'btn-light');
+  }
 
   tr.append(taskIdCell, taskNumberCell, taskNameCell, stateCell, btnTd);
 

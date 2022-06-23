@@ -19,30 +19,24 @@ export const btnControl = (tBody, usersName) => {
       }
     }
 
-    if (target.closest('.btn-success')) {
+    if (target.closest('.done-toggle')) {
       const data = getStorage(usersName);
       const dataIndex = data.find((obj => obj.taskId === taskId));
       const getName = localStorage.getItem('userName');
 
       if (dataIndex.taskState === 'Выполнена') {
         dataIndex.taskState = 'В процессе';
-        while (tBody.lastElementChild) {
-          tBody.removeChild(tBody.lastElementChild);
-        }
-
-        setStorage(usersName, data);
-        renderTasks(tBody, getName);
-        counterControl(tBody, getName);
       } else {
         dataIndex.taskState = 'Выполнена';
-        target.parentNode.parentNode.removeAttribute('class');
-        target.parentNode.parentNode.classList.add('table-success');
-        target.parentNode.parentNode.children[3].textContent = 'Выполнена';
-        target.parentNode.parentNode.children[2].classList.remove('task');
-        target.parentNode.parentNode.children[2].classList.add(
-            'text-decoration-line-through');
-        setStorage(usersName, data);
       }
+
+      while (tBody.lastElementChild) {
+        tBody.removeChild(tBody.lastElementChild);
+      }
+
+      setStorage(usersName, data);
+      renderTasks(tBody, getName);
+      counterControl(tBody, getName);
     }
 
     if (target.closest('.btn-warning')) {
