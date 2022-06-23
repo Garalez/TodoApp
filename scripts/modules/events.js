@@ -22,14 +22,27 @@ export const btnControl = (tBody, usersName) => {
     if (target.closest('.btn-success')) {
       const data = getStorage(usersName);
       const dataIndex = data.find((obj => obj.taskId === taskId));
-      dataIndex.taskState = 'Выполнена';
-      target.parentNode.parentNode.removeAttribute('class');
-      target.parentNode.parentNode.classList.add('table-success');
-      target.parentNode.parentNode.children[3].textContent = 'Выполнена';
-      target.parentNode.parentNode.children[2].classList.remove('task');
-      target.parentNode.parentNode.children[2].classList.add(
-          'text-decoration-line-through');
-      setStorage(usersName, data);
+      const getName = localStorage.getItem('userName');
+
+      if (dataIndex.taskState === 'Выполнена') {
+        dataIndex.taskState = 'В процессе';
+        while (tBody.lastElementChild) {
+          tBody.removeChild(tBody.lastElementChild);
+        }
+
+        setStorage(usersName, data);
+        renderTasks(tBody, getName);
+        counterControl(tBody, getName);
+      } else {
+        dataIndex.taskState = 'Выполнена';
+        target.parentNode.parentNode.removeAttribute('class');
+        target.parentNode.parentNode.classList.add('table-success');
+        target.parentNode.parentNode.children[3].textContent = 'Выполнена';
+        target.parentNode.parentNode.children[2].classList.remove('task');
+        target.parentNode.parentNode.children[2].classList.add(
+            'text-decoration-line-through');
+        setStorage(usersName, data);
+      }
     }
 
     if (target.closest('.btn-warning')) {
@@ -50,7 +63,7 @@ export const btnControl = (tBody, usersName) => {
   });
 };
 
-export const modalControl = (modalForm, overlay, tbody) => {
+export const modalControl = (modalForm, overlay, tBody) => {
   modalForm.addEventListener('submit', e => {
     e.preventDefault();
     overlay.style.opacity = '0';
@@ -58,27 +71,34 @@ export const modalControl = (modalForm, overlay, tbody) => {
     const usersName = modalForm.name.value;
     localStorage.setItem('userName', usersName);
     const getName = localStorage.getItem('userName');
-    while (tbody.lastElementChild) {
-      tbody.removeChild(tbody.lastElementChild);
+    while (tBody.lastElementChild) {
+      tBody.removeChild(tBody.lastElementChild);
     }
-    renderTasks(tbody, getName);
+    renderTasks(tBody, getName);
   });
 };
 
 export const taskControl = (tBody, form, btnReset, dropDown, usersName) => {
   form.addEventListener('submit', e => {
     e.preventDefault();
-    const obj = {
-      'taskId': Math.random().toString().substring(2, 10),
-      'taskImportance': dropDown.value,
-      'taskName': form.task.value,
-      'taskState': 'В процессе',
-    };
-    setStorage(usersName, obj);
-    tBody.append(createTasks(obj, tBody));
-    counterControl(tBody, usersName);
-    form[2].disabled = true;
-    form.reset();
+    if (/^\s/.test(form.task.value)) {
+      alert('Неверное название задачи!');
+      form.reset();
+      form[2].disabled = true;
+      return;
+    } else {
+      const obj = {
+        'taskId': Math.random().toString().substring(2, 10),
+        'taskImportance': dropDown.value,
+        'taskName': form.task.value,
+        'taskState': 'В процессе',
+      };
+      setStorage(usersName, obj);
+      tBody.append(createTasks(obj, tBody));
+      counterControl(tBody, usersName);
+      form[2].disabled = true;
+      form.reset();
+    }
   });
 
   btnReset.addEventListener('click', () => {
