@@ -1,35 +1,3 @@
-'use strict';
-
-const getStorage = key => {
-  const objFromStorage = JSON.parse(localStorage.getItem(key));
-  if (objFromStorage === null) {
-    return [];
-  } else {
-    return objFromStorage;
-  }
-};
-
-const setStorage = (key, obj) => {
-  const getData = getStorage(key);
-  if (Array.isArray(obj)) {
-    getData.splice(0, getData.length, ...obj);
-  } else {
-    getData.push(obj);
-  }
-  const newData = JSON.stringify(getData);
-  localStorage.setItem(key, newData);
-};
-
-const removeStorage = (taskId, usersName) => {
-  const getDataFromStorage = getStorage(usersName);
-  getDataFromStorage.forEach((item, index) => {
-    if (taskId === item.taskId) {
-      getDataFromStorage.splice([index], 1);
-      setStorage(usersName, getDataFromStorage);
-    }
-  });
-};
-
 const createButtonsGroup = params => {
   const btns = params.map(({className, type, text}) => {
     const button = document.createElement('button');
@@ -125,6 +93,7 @@ const createForm = (overlay) => {
   const dropDown = document.createElement('select');
   dropDown.style.padding = '5px';
   dropDown.style.marginRight = '10px';
+  dropDown.style.fontSize = '18px';
   const lowImportance = document.createElement('option');
   lowImportance.textContent = 'обычная';
   const midImportance = document.createElement('option');
@@ -196,16 +165,6 @@ const createTable = (form) => {
   return tBody;
 };
 
-const counterControl = (tBody, usersName) => {
-  const data = getStorage(usersName);
-
-  tBody.childNodes.forEach((e, inx) => {
-    e.children[1].textContent = inx + 1;
-  });
-
-  setStorage(usersName, data);
-};
-
 const createTasks = ({taskId, taskImportance, taskName, taskState}) => {
   const tr = document.createElement('tr');
   if (taskImportance === 'обычная') {
@@ -256,118 +215,9 @@ const createTasks = ({taskId, taskImportance, taskName, taskState}) => {
   return tr;
 };
 
-const btnControl = (tBody, usersName) => {
-  tBody.addEventListener('click', e => {
-    const target = e.target;
-    const taskId = target.parentNode.parentNode.children[0].textContent;
-    if (target.closest('.btn-danger')) {
-      const confirmation = confirm('Вы уверены что хотите удалить задание?');
-      if (confirmation === true) {
-        target.closest('tr').remove();
-        removeStorage(taskId, usersName);
-        counterControl(tBody, usersName);
-      }
-    }
-    if (target.closest('.btn-success')) {
-      const data = getStorage(usersName);
-      const dataIndex = data.find((obj => obj.taskId === taskId));
-      dataIndex.taskState = 'Выполнена';
-      target.parentNode.parentNode.removeAttribute('class');
-      target.parentNode.parentNode.classList.add('table-success');
-      target.parentNode.parentNode.children[3].textContent = 'Выполнена';
-      target.parentNode.parentNode.children[2].classList.remove('task');
-      target.parentNode.parentNode.children[2].classList.add(
-          'text-decoration-line-through');
-      setStorage(usersName, data);
-      console.log(usersName);
-    }
-    if (target.closest('.btn-warning')) {
-      const data = getStorage(usersName);
-      const dataIndex = data.find((obj => obj.taskId === taskId));
-      target.parentNode.parentNode.children[2].setAttribute(
-          'contenteditable', 'true');
-      target.parentNode.parentNode.children[2].focus();
-      target.parentNode.parentNode.children[2].addEventListener(
-          'focusout', () => {
-            dataIndex.taskName =
-            target.parentNode.parentNode.children[2].textContent;
-            target.parentNode.parentNode.children[2].setAttribute(
-                'contenteditable', 'false');
-            setStorage(usersName, data);
-          });
-    }
-  });
+export default {
+  createModal,
+  createForm,
+  createTable,
+  createTasks,
 };
-
-const renderTasks = (tBody, data) => {
-  const user = getStorage(data);
-  const allRow = user.map(createTasks);
-  tBody.append(...allRow);
-  return allRow;
-};
-
-const modalControl = (modalForm, overlay, tbody) => {
-  modalForm.addEventListener('submit', e => {
-    e.preventDefault();
-    overlay.style.opacity = '0';
-    overlay.style.visibility = 'hidden';
-    const usersName = modalForm.name.value;
-    localStorage.setItem('userName', usersName);
-    const getName = localStorage.getItem('userName');
-    console.log('getName: ', getName);
-    while (tbody.lastElementChild) {
-      tbody.removeChild(tbody.lastElementChild);
-    }
-    renderTasks(tbody, getName);
-  });
-};
-
-const taskControl = (tBody, form, btnReset, dropDown, usersName) => {
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    const obj = {
-      'taskId': Math.random().toString().substring(2, 10),
-      'taskImportance': dropDown.value,
-      'taskName': form.task.value,
-      'taskState': 'В процессе',
-    };
-    setStorage(usersName, obj);
-    tBody.append(createTasks(obj, tBody));
-    counterControl(tBody, usersName);
-    form[2].disabled = true;
-    form.reset();
-  });
-  btnReset.addEventListener('click', () => {
-    while (tBody.lastElementChild) {
-      tBody.removeChild(tBody.lastElementChild);
-      localStorage.removeItem(usersName);
-    }
-  });
-};
-
-const init = () => {
-  const {
-    overlay,
-    modalForm,
-  } = createModal();
-  const {
-    form,
-    btnReset,
-    dropDown,
-  } = createForm(overlay);
-  const tBody = createTable(form);
-
-  modalControl(modalForm, overlay, tBody);
-
-  modalForm.addEventListener('submit', () => {
-    const usersName = localStorage.getItem('userName');
-    const getDataFromStorage = localStorage.getItem(usersName);
-
-    renderTasks(tBody, getDataFromStorage);
-    btnControl(tBody, usersName);
-    taskControl(tBody, form, btnReset, dropDown, usersName);
-    counterControl(tBody, usersName);
-  });
-};
-
-init();
