@@ -30,7 +30,6 @@ export const btnControl = (tBody, usersName) => {
       target.parentNode.parentNode.children[2].classList.add(
           'text-decoration-line-through');
       setStorage(usersName, data);
-      console.log(usersName);
     }
 
     if (target.closest('.btn-warning')) {
