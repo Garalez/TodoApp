@@ -208,7 +208,7 @@ const createTasks = ({taskId, taskImportance, taskName, taskState}) => {
     taskNameCell.removeAttribute('class');
     taskNameCell.classList.add('text-decoration-line-through');
     stateCell.textContent = 'Выполнена';
-    successBtn.classList.replace('btn-success', 'btn-light');
+    successBtn.classList.replace('btn-success', 'btn-secondary');
   }
 
   tr.append(taskIdCell, taskNumberCell, taskNameCell, stateCell, btnTd);
