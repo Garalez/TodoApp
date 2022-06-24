@@ -165,7 +165,7 @@ const createTable = (form) => {
   return tBody;
 };
 
-const createTasks = ({taskId, taskImportance, taskName, taskState}) => {
+const createTasks = ({taskId, taskImportance, taskName, completion}) => {
   const tr = document.createElement('tr');
   if (taskImportance === 'обычная') {
     tr.classList.add('table-light');
@@ -202,7 +202,7 @@ const createTasks = ({taskId, taskImportance, taskName, taskState}) => {
   successBtn.textContent = 'Завершить';
   btnTd.append(editBtn, deleteBtn, successBtn);
 
-  if (taskState === 'Выполнена') {
+  if (completion === true) {
     tr.removeAttribute('class');
     tr.classList.add('table-success');
     taskNameCell.removeAttribute('class');

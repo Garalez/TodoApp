@@ -24,10 +24,10 @@ export const btnControl = (tBody, usersName) => {
       const dataIndex = data.find((obj => obj.taskId === taskId));
       const getName = localStorage.getItem('userName');
 
-      if (dataIndex.taskState === 'Выполнена') {
-        dataIndex.taskState = 'В процессе';
+      if (dataIndex.completion === true) {
+        dataIndex.completion = false;
       } else {
-        dataIndex.taskState = 'Выполнена';
+        dataIndex.completion = true;
       }
 
       while (tBody.lastElementChild) {
@@ -85,7 +85,7 @@ export const taskControl = (tBody, form, btnReset, dropDown, usersName) => {
         'taskId': Math.random().toString().substring(2, 10),
         'taskImportance': dropDown.value,
         'taskName': form.task.value,
-        'taskState': 'В процессе',
+        'completion': false,
       };
       setStorage(usersName, obj);
       tBody.append(createTasks(obj, tBody));
